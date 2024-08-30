@@ -1,4 +1,7 @@
-import React from 'react'
+"use client";
+import { Link } from '@/routing';
+import { useTranslations } from 'next-intl';
+import React, { useEffect, useState } from 'react'
 
 interface User {
   id: number;
@@ -6,11 +9,20 @@ interface User {
   email: string;
 }
 
-const UsersPage = async () => {
+const fetchUsers = async () => {
   const res = await fetch('https://jsonplaceholder.typicode.com/users', {
     next: { revalidate: 10 }
   });
-  const users: User[] = await res.json();
+  return res.json();
+}
+
+const UsersPage = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const t = useTranslations('HomePage');
+
+  useEffect(() => {
+    fetchUsers().then(setUsers);
+  }, []);
 
   return (
     <>
@@ -32,8 +44,9 @@ const UsersPage = async () => {
           ))}
         </tbody>
       </table>
+      <p>Press <Link href="/users/new">{t('newUser')}</Link></p>
     </>
   )
 }
 
-export default UsersPage
+export default UsersPage;
